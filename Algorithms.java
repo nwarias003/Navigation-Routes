@@ -1,12 +1,12 @@
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.HashSet;
 
 public class Algorithms {
 
@@ -104,5 +104,88 @@ public class Algorithms {
         }
 
         return route;
+    }
+
+    /**
+     * Distributes an island's natural resource to all other islands.
+     *
+     * @param graph The island graph.
+     * @param resources A Map with the type and quantity of an island's natural resource.
+     * @param source The starting island whose resource will be distributed.
+     * @param canoes The number of canoes that will distribute the resource.
+     * @return A list of strings detailing the route taken by the canoes, including return trips.
+     */
+    public static List<String> distributeNaturalResource(Map<String, List<DataLoader.Edge>> graph, Map<String, Map<String, Integer>> resources, String source, int canoes) {
+        
+        // Initializes data structures
+        PriorityQueue<IslandState> queue = new PriorityQueue<>(Comparator.comparingInt(s -> s.time));   // Queue where shortest travel time is prioritized
+        Map<String, Integer> shortestPaths = new HashMap<>();                                           // Store shortest path time to each island
+        Map<String, Boolean> visited = new HashMap<>();                                                 // Track visited islands
+        List<String> route = new ArrayList<>();                                                         // Store the route sequence.
+        
+        // Initializes variables
+        int totalTime = 0;              // Total time taken to distribute the resource
+        int remainingCanoes = canoes;   // Number of canoes remaining before returning to the source
+        
+        // Adds source island to queue and sets shortest path time to 0
+        queue.add(new IslandState(source, 0));
+        shortestPaths.put(source, 0);
+
+        // Continues distributing resource until all islands are visited
+        while (!queue.isEmpty()) {
+            // Retrieves next island to visit with the shortest travel time
+            IslandState current = queue.poll();
+            String currentIsland = current.island;
+
+            // Skips the island if 'true' is returned, since it has already been visited
+            if (visited.getOrDefault(currentIsland, false)) {
+                continue;
+            }
+
+            // Visits the island, updates the route and total time
+            visited.put(currentIsland, true);
+            route.add("Visited " + currentIsland);
+            totalTime += current.time;
+
+            // Decrements the number of stocked canoes on each visit to an island
+            remainingCanoes--;
+            // Returns to the source island to reload canoes if all canoes are used up
+            if (remainingCanoes == 0) {
+                route.add("Returning to " + source + " to reload");
+                totalTime += shortestPaths.get(currentIsland);                  // Adds return time to total time   
+                queue.add(new IslandState(source, shortestPaths.get(source)));  // Adds source island back to queue
+                remainingCanoes = canoes;                                       // Resets the number of canoes
+                continue;                                                       // Begins distributing resource again
+            }
+
+            // Processes each island directly connected to the current island
+            for (DataLoader.Edge edge : graph.getOrDefault(currentIsland, new ArrayList<>())) {
+                // Calculates cumulative travel time to reach the connected island, adding the time it takes to get from
+                // the current island to the connected island and the time it takes to get from the source to the connected island
+                int newTime = current.time + edge.travelTime;
+                
+                // Checks if the new time is shorter than the current shortest path time to the connected island
+                if (newTime < shortestPaths.getOrDefault(edge.destination, Integer.MAX_VALUE)) {
+                    shortestPaths.put(edge.destination, newTime);               // Updates the shortest path time to the connected island
+                    queue.add(new IslandState(edge.destination, newTime));      // Adds the connected island to the queue with the new time
+                }
+            }
+        }
+
+        // Outputs total time for distribution and returns the route taken
+        System.out.println("Total path timelength: " + totalTime);
+        return route;
+
+    }
+    
+    // Helper class stores the state of the island with name and travel time
+    private static class IslandState {
+        String island;
+        int time;
+
+        IslandState(String island, int time) {
+            this.island = island;
+            this.time = time;
+        }
     }
 }
