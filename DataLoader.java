@@ -44,7 +44,6 @@ public class DataLoader {
         addEdge(graph, "Rotuma", "Tuvalu", 7);
         addEdge(graph, "Tuvalu", "Tokelau", 5);
 
-        
         return graph;
     }
 
@@ -55,33 +54,76 @@ public class DataLoader {
      */
     public static Map<String, Integer> getIslandPopulations() {
         Map<String, Integer> populations = new HashMap<>();
-        populations.put("Samoa", 40000);
-        populations.put("Cook Islands", 8500);
-        populations.put("Rapa Nui", 8000);
-        populations.put("Tahiti", 38000);
-        populations.put("Tuamotu Islands", 5500);
-        populations.put("Mangareva", 1500);
-        populations.put("Marquesas Islands", 30000);
-        populations.put("Austral Islands", 6500);
-        populations.put("Oahu", 50000);
         populations.put("Hawaii", 100000);
         populations.put("Maui", 50000);
+        populations.put("Oahu", 50000);
         populations.put("Kauai", 33000);
+        populations.put("Tahiti", 38000);
+        populations.put("Austral Islands", 6500);
+        populations.put("Marquesas Islands", 30000);
+        populations.put("Tuamotu Islands", 5500);
+        populations.put("Mangareva", 1500);
+        populations.put("Rapa Nui", 8000);
+        populations.put("Cook Islands", 8500);
         populations.put("Aotearoa", 110000);
         populations.put("Chatham Islands", 2000);
-        populations.put("Niue", 4500);
-        populations.put("Rotuma", 2800);
-        populations.put("Tokelau", 1300);
         populations.put("Tonga", 35000);
-        populations.put("Tuvalu", 3500);
+        populations.put("Niue", 4500);
+        populations.put("Samoa", 40000);
         populations.put("Wallis and Futuna", 6000);
-        
+        populations.put("Rotuma", 2800);
+        populations.put("Tuvalu", 3500);
+        populations.put("Tokelau", 1300);
+
         return populations;
     }
 
-    private static void addEdge(Map<String, List<Edge>> graph, String from, String to, int travelTime) {
-        graph.putIfAbsent(from, new ArrayList<>());
-        graph.get(from).add(new Edge(to, travelTime));
+    /**
+     * Generates natural resource data for each island.
+     * 
+     * @return A Map where each key is an island name, and the value is a map of resources and quantities.
+     */
+    public static Map<String, Map<String, Integer>> setNaturalResource() {
+        Map<String, Map<String,Integer>> naturalResources = new HashMap<>();
+        naturalResources.put("Hawaii", setResourceQuantity("Koa Wood", 10000));
+        naturalResources.put("Maui", setResourceQuantity("Lokelani Rose", 5000));
+        naturalResources.put("Oahu", setResourceQuantity("Pineapple", 8000));
+        naturalResources.put("Kauai", setResourceQuantity("Taro", 4000));
+        naturalResources.put("Tahiti", setResourceQuantity("Vanilla Bean", 3500));
+        naturalResources.put("Austral Islands", setResourceQuantity("Coffee Bean", 1500));
+        naturalResources.put("Marquesas Islands", setResourceQuantity("Papaya", 6000));
+        naturalResources.put("Tuamotu Islands", setResourceQuantity("Lilikoi", 1000));
+        naturalResources.put("Mangareva", setResourceQuantity("Guava", 800));
+        naturalResources.put("Rapa Nui", setResourceQuantity("Sweet Potato", 2000));
+        naturalResources.put("Cook Islands", setResourceQuantity("Cacao", 1700));
+        naturalResources.put("Aotearoa", setResourceQuantity("Silver Fern", 11000));
+        naturalResources.put("Chatham Islands", setResourceQuantity("Kukui Nut", 500));
+        naturalResources.put("Tonga", setResourceQuantity("Yam", 7000));
+        naturalResources.put("Niue", setResourceQuantity("Hibiscus Flower", 1000));
+        naturalResources.put("Samoa", setResourceQuantity("Coconut", 8000));
+        naturalResources.put("Wallis and Futuna", setResourceQuantity("Banana", 1200));
+        naturalResources.put("Rotuma", setResourceQuantity("Kava", 1500));
+        naturalResources.put("Tuvalu", setResourceQuantity("Rice", 1200));
+        naturalResources.put("Tokelau", setResourceQuantity("Lychee", 500));
+
+        return naturalResources;
+    }
+
+    // Adds a bidirectional edge between two islands with a given travel time.
+    private static void addEdge(Map<String, List<Edge>> graph, String islandA, String islandB, int travelTime) {        
+        graph.putIfAbsent(islandA, new ArrayList<>());
+        graph.get(islandA).add(new Edge(islandB, travelTime));
+
+        graph.putIfAbsent(islandB, new ArrayList<>());
+        graph.get(islandB).add(new Edge(islandA, travelTime));
+    }
+
+    // Maps the resource name to the quantity.
+    private static Map<String, Integer> setResourceQuantity(String name, int quantity) {
+        Map<String, Integer> resources = new HashMap<>();
+        resources.put(name, quantity);
+
+        return resources;
     }
 
     public static class Edge {
