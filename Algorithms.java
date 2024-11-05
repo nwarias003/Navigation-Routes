@@ -120,12 +120,19 @@ public class Algorithms {
         // Initializes data structures
         PriorityQueue<IslandState> queue = new PriorityQueue<>(Comparator.comparingInt(s -> s.time));   // Queue where shortest travel time is prioritized
         Map<String, Integer> shortestPaths = new HashMap<>();                                           // Store shortest path time to each island
-        Map<String, Boolean> visited = new HashMap<>();                                                 // Track visited islands
+        Map<String, Boolean> visited = new HashMap<>();
+        Map<String, Integer> resourceDistribution = new HashMap<>();                                                 // Track visited islands
         List<String> route = new ArrayList<>();                                                         // Store the route sequence.
         
         // Initializes variables
         int totalTime = 0;              // Total time taken to distribute the resource
         int remainingCanoes = canoes;   // Number of canoes remaining before returning to the source
+        
+        for (String island : graph.keySet()) { 
+           shortestPaths.put(island, Integer.MAX_VALUE); 
+           visited.put(island, false); 
+           resourceDistribution.put(island, 0); 
+        }
         
         // Adds source island to queue and sets shortest path time to 0
         queue.add(new IslandState(source, 0));
@@ -146,6 +153,7 @@ public class Algorithms {
             visited.put(currentIsland, true);
             route.add("Visited " + currentIsland);
             totalTime += current.time;
+            
 
             // Decrements the number of stocked canoes on each visit to an island
             remainingCanoes--;
@@ -177,6 +185,63 @@ public class Algorithms {
         return route;
 
     }
+   // Method to distribute a resource from the start island to other islands 
+   public static List<String> distributeResource(Map<String, List<DataLoader.Edge>> graph, Map<String, Map<String, Integer>> resources, String startIsland, String resource, int numCanoes, int canoeCapacity) { 
+   PriorityQueue<DataLoader.Edge> queue = new PriorityQueue<>(Comparator.comparingInt(e -> e.travelTime)); 
+   Map<String, Integer> distances = new HashMap<>(); 
+   Map<String, Boolean> visited = new HashMap<>(); 
+   Map<String, Integer> resourceDistribution = new HashMap<>(); 
+   List<String> distributionRoute = new ArrayList<>(); 
+   
+   // Initialize distances and visited maps 
+   for(String island : graph.keySet()) { 
+      distances.put(island, Integer.MAX_VALUE); visited.put(island, false); 
+      resourceDistribution.put(island, 0); 
+   } 
+   
+   // Set the distance to the start island to 0 and add it to the queue 
+   distances.put(startIsland, 0); 
+   queue.add(new DataLoader.Edge(startIsland, 0)); 
+   
+   // Dijkstra's algorithm to find the shortest paths from the start island 
+   while (!queue.isEmpty()) { 
+      DataLoader.Edge current = queue.poll(); 
+      String currentIsland = current.destination; 
+      
+      if (visited.get(currentIsland)) continue; 
+         visited.put(currentIsland, true); 
+         
+         for (DataLoader.Edge edge : graph.get(currentIsland)) { 
+            String neighbor = edge.destination; 
+            int newDist = distances.get(currentIsland) + edge.travelTime; 
+            
+            if (newDist < distances.get(neighbor)) { 
+               distances.put(neighbor, newDist); 
+               queue.add(new DataLoader.Edge(neighbor, newDist)); 
+            } 
+         } 
+      } 
+      
+      // Check if the resource is available on the start island 
+      if (!resources.containsKey(startIsland) || !resources.get(startIsland).containsKey(resource)) { 
+         System.out.println("\nResource not found on the start island."); 
+         return distributionRoute; 
+      } 
+      
+      // Distribute the resource to other islands 
+      int remainingResource = resources.get(startIsland).get(resource); 
+      
+      for (String island : distances.keySet()) { 
+         
+         if (!island.equals(startIsland) && remainingResource > 0) { 
+            int neededResource = Math.min(canoeCapacity, remainingResource); 
+            resourceDistribution.put(island, neededResource); 
+            remainingResource -= neededResource; 
+            distributionRoute.add("Deliver " + neededResource + " units of " + resource + " to " + island); 
+         } 
+      } 
+      return distributionRoute; 
+   }
     
     // Helper class stores the state of the island with name and travel time
     private static class IslandState {
