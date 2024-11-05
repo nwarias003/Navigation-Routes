@@ -108,6 +108,33 @@ public class DataLoader {
 
         return naturalResources;
     }
+    
+   public static Map<String, Map<String, Integer>> getNaturalResources() { 
+   // Initialize the resources available on each island 
+      Map<String, Map<String, Integer>> resources = new HashMap<>(); 
+      resources.put("Hawaii", new HashMap<>()); 
+      resources.put("Maui", new HashMap<>()); 
+      resources.put("Oahu", new HashMap<>()); 
+      resources.put("Kauai", new HashMap<>()); 
+      resources.put("Tahiti", new HashMap<>()); 
+      resources.put("Austral Islands", new HashMap<>());
+      resources.put("Marquesas Islands", new HashMap<>());
+      resources.put("Tuamotu Islands", new HashMap<>()); 
+      resources.put("Mangareva", new HashMap<>()); 
+      resources.put("Rapa Nui", new HashMap<>()); 
+      resources.put("Cook Islands", new HashMap<>()); 
+      resources.put("Aotearoa", new HashMap<>()); 
+      resources.put("Chatham Islands", new HashMap<>()); 
+      resources.put("Tonga", new HashMap<>()); 
+      resources.put("Niue", new HashMap<>()); 
+      resources.put("Samoa", new HashMap<>()); 
+      resources.put("Wallis and Futuna", new HashMap<>()); 
+      resources.put("Rotuma", new HashMap<>()); 
+      resources.put("Tuvalu", new HashMap<>()); 
+      resources.put("Tokelau", new HashMap<>()); 
+      
+      return resources;
+   }
 
     // Adds a bidirectional edge between two islands with a given travel time.
     private static void addEdge(Map<String, List<Edge>> graph, String islandA, String islandB, int travelTime) {        
